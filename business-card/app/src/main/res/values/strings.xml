@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Business Card</string>
+    <string name="owner_name">Jennifer Doe</string>
+    <string name="owner_title">Android Developer Extraordinaire</string>
+    <string name="owner_phone">+11 (123) 444 555 666</string>
+    <string name="owner_share">\@AndroidDev</string>
+    <string name="owner_mail">jen.doe@android.com</string>
 </resources>
