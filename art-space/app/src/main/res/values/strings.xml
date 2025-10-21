@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Art Space</string>
+    <string name="art_1_name">Art 1</string>
+    <string name="art_1_artist">Jonny Gios</string>
+    <string name="art_1_published_year">2025</string>
+    <string name="art_2_name">Art 2</string>
+    <string name="art_2_artist">Kellen Riggin</string>
+    <string name="art_2_published_year">2025</string>
+    <string name="art_3_name">Art 3</string>
+    <string name="art_3_artist">Kristaps Ungurs</string>
+    <string name="art_3_published_year">2025</string>
+</resources>
