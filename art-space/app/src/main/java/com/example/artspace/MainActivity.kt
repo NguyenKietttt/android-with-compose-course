@@ -58,8 +58,7 @@ class MainActivity : ComponentActivity() {
 fun ArtSpaceApp(modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .padding(start = 24.dp, end = 24.dp)
+        modifier = modifier.padding(start = 24.dp, end = 24.dp)
     ) {
         var index by remember { mutableIntStateOf(1) }
 
@@ -127,10 +126,8 @@ fun Picture(
         Image(
             painter = painterResource(pictureId),
             contentDescription = null,
-            contentScale = ContentScale.FillBounds,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp)
+            contentScale = ContentScale.FillHeight,
+            modifier = Modifier.padding(24.dp)
         )
     }
 }
@@ -143,10 +140,9 @@ fun Description(
     modifier: Modifier = Modifier
 ) {
     Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
-        modifier = modifier
-            .fillMaxSize()
-            .background(Color(0xffecebf3))
+        modifier = modifier.background(Color(0xffecebf3))
     ) {
         Text(
             text = stringResource(artNameId),
@@ -159,7 +155,9 @@ fun Description(
                     append(stringResource(artistId))
                 }
                 append(" ")
+                append("(")
                 append(stringResource(publishedYearId))
+                append(")")
             },
             modifier = Modifier.padding(start = 24.dp, end = 24.dp)
         )
