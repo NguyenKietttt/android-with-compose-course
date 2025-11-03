@@ -140,6 +140,7 @@ fun CupcakeApp(
                     options = uiState.pickupOptions,
                     onSelectionChanged = { viewModel.setDate(it) },
                     onNextButtonClicked = { navController.navigate(CupcakeScreen.Summary.name) },
+                    onCancelButtonClicked = { cancelOrderAndNavigateToStart(viewModel, navController) },
                     modifier = Modifier.fillMaxHeight()
                 )
             }
