@@ -48,6 +48,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import com.example.reply.R
 import com.example.reply.data.Email
 import com.example.reply.data.local.LocalAccountsDataProvider
@@ -101,7 +102,10 @@ fun ReplyListAndDetailContent(
             contentPadding = WindowInsets.statusBars.asPaddingValues(),
             modifier = Modifier
                 .weight(1f)
-                .padding(horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding)),
+                .padding(
+                    horizontal = dimensionResource(R.dimen.email_list_only_horizontal_padding),
+                    vertical = 18.dp
+                ),
             verticalArrangement = Arrangement.spacedBy(
                 dimensionResource(R.dimen.email_list_item_vertical_spacing)
             )
@@ -116,7 +120,7 @@ fun ReplyListAndDetailContent(
                 )
             }
         }
-        val activity = LocalContext.current as Activity
+//        val activity = LocalContext.current as Activity
         ReplyDetailsScreen(
             replyUiState = replyUiState,
             modifier = Modifier
