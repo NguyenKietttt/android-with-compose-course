@@ -9,29 +9,30 @@ class MyCityViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(MyCityUiState())
     val uiState: StateFlow<MyCityUiState> = _uiState
 
-    fun navigateToCategoryPage() {
+    fun navigateToListCategoryScreen() {
         _uiState.update {
             it.copy(
-                isShowingLocationPage = false,
-                isShowingDetailsPage = false,
+                isShowingListLocationScreen = false,
+                isShowingLocationScreen = false,
             )
         }
     }
 
-    fun navigateToLocationPage() {
+    fun navigateToListLocationScreen(category: String) {
         _uiState.update {
             it.copy(
-                isShowingLocationPage = true,
-                isShowingDetailsPage = false,
+                currentCategory = category,
+                isShowingListLocationScreen = true,
+                isShowingLocationScreen = false,
             )
         }
     }
 
-    fun navigateToDetailPage() {
+    fun navigateToLocationScreen() {
         _uiState.update {
             it.copy(
-                isShowingLocationPage = false,
-                isShowingDetailsPage = true,
+                isShowingListLocationScreen = false,
+                isShowingLocationScreen = true,
             )
         }
     }

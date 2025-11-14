@@ -28,6 +28,16 @@ fun MyCityApp() {
             composable(route = MyCityScreen.LIST_CATEGORY.name) {
                 ListCategoryScreen(
                     listCategory = DataSource.getListCategory(),
+                    onClick = { category ->
+                        viewModel.navigateToListLocationScreen(category)
+                        navController.navigate(MyCityScreen.LIST_LOCATION.name)
+                    },
+                    modifier = Modifier
+                )
+            }
+            composable(route = MyCityScreen.LIST_LOCATION.name) {
+                ListLocationScreen(
+                    listLocation = DataSource.getListLocationByCategory(uiState.currentCategory),
                     onClick = { },
                     modifier = Modifier
                 )

@@ -16,7 +16,7 @@ import com.example.mycity.data.DataSource
 @Composable
 fun ListCategoryScreen(
     listCategory: List<String>,
-    onClick: () -> Unit,
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
@@ -24,7 +24,7 @@ fun ListCategoryScreen(
             Box(
                 modifier = Modifier
                     .padding(16.dp)
-                    .clickable(onClick = onClick)
+                    .clickable(onClick = { onClick(category) })
             ) {
                 Text(text = category)
             }
