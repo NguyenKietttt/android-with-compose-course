@@ -1,5 +1,6 @@
 package com.example.mycity.ui
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -12,10 +13,9 @@ fun LocationScreen(
     location: Location,
     modifier: Modifier = Modifier
 ) {
-    Text(
-        text = location.description,
-        modifier = modifier
-    )
+    Box(modifier = modifier) {
+        Text(text = location.description)
+    }
 }
 
 @Preview

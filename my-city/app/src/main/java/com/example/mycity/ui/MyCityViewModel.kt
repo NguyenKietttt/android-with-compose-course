@@ -1,6 +1,7 @@
 package com.example.mycity.ui
 
 import androidx.lifecycle.ViewModel
+import com.example.mycity.model.Location
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -28,9 +29,10 @@ class MyCityViewModel : ViewModel() {
         }
     }
 
-    fun navigateToLocationScreen() {
+    fun navigateToLocationScreen(location: Location) {
         _uiState.update {
             it.copy(
+                currentLocation = location,
                 isShowingListLocationScreen = false,
                 isShowingLocationScreen = true,
             )

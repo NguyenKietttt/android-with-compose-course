@@ -17,7 +17,7 @@ import com.example.mycity.model.Location
 @Composable
 fun ListLocationScreen(
     listLocation: List<Location>,
-    onClick: () -> Unit,
+    onClick: (Location) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier = modifier) {
@@ -25,7 +25,7 @@ fun ListLocationScreen(
             Box(
                 modifier = Modifier
                     .padding(16.dp)
-                    .clickable(onClick = onClick)
+                    .clickable(onClick = { onClick(location) })
             ) {
                 Text(text = location.name)
             }
