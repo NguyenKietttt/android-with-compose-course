@@ -38,8 +38,9 @@ fun MyCityApp() {
         topBar = {
             MyCityAppBar(
                 currentScreen = currentScreen,
-                canNavigateBack = true,
-                navigateUp = { }
+                uiState = uiState,
+                canNavigateBack = navController.previousBackStackEntry != null,
+                navigateUp = { navController.navigateUp() }
             )
         }
     ) { innerPadding ->
@@ -82,12 +83,19 @@ fun MyCityApp() {
 @Composable
 fun MyCityAppBar(
     currentScreen: MyCityScreen,
+    uiState: MyCityUiState,
     canNavigateBack: Boolean,
     navigateUp: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val title = when (currentScreen) {
+        MyCityScreen.LIST_CATEGORY -> stringResource(R.string.app_name)
+        MyCityScreen.LIST_LOCATION -> uiState.currentCategory
+        else -> uiState.currentLocation.name
+    }
+
     TopAppBar(
-        title = { Text(stringResource(R.string.app_name)) },
+        title = { Text(title) },
         navigationIcon = {
             if (canNavigateBack) {
                 IconButton(onClick = navigateUp) {
@@ -98,6 +106,6 @@ fun MyCityAppBar(
                 }
             }
         },
-        modifier = Modifier
+        modifier = modifier
     )
 }
