@@ -9,6 +9,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -16,18 +17,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.mycity.R
-import com.example.mycity.data.DataSource
+import com.example.mycity.utils.ContentType
 
 @Composable
-fun MyCityApp() {
+fun MyCityApp(
+    windowSize: WindowWidthSizeClass
+) {
     val navController: NavHostController = rememberNavController()
     val viewModel: MyCityViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
+
+    val contentType: ContentType = when (windowSize) {
+        WindowWidthSizeClass.Expanded -> ContentType.ListAndDetail
+        else -> ContentType.ListOnly
+    }
 
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentScreen = MyCityScreen.valueOf(
@@ -44,37 +50,19 @@ fun MyCityApp() {
             )
         }
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = MyCityScreen.LIST_CATEGORY.name,
-            modifier = Modifier.padding(innerPadding)
-        ) {
-            composable(route = MyCityScreen.LIST_CATEGORY.name) {
-                ListCategoryScreen(
-                    listCategory = DataSource.getListCategory(),
-                    onClick = { category ->
-                        viewModel.navigateToListLocationScreen(category)
-                        navController.navigate(MyCityScreen.LIST_LOCATION.name)
-                    },
-                    modifier = Modifier
-                )
-            }
-            composable(route = MyCityScreen.LIST_LOCATION.name) {
-                ListLocationScreen(
-                    listLocation = DataSource.getListLocationByCategory(uiState.currentCategory),
-                    onClick = { location ->
-                        viewModel.navigateToLocationScreen(location)
-                        navController.navigate(MyCityScreen.LOCATION.name)
-                    },
-                    modifier = Modifier
-                )
-            }
-            composable(route = MyCityScreen.LOCATION.name) {
-                LocationScreen(
-                    location = uiState.currentLocation,
-                    modifier = Modifier
-                )
-            }
+        if (contentType == ContentType.ListOnly) {
+            ListOnlyScreen(
+                navController = navController,
+                viewModel = viewModel,
+                uiState = uiState,
+                modifier = Modifier.padding(innerPadding)
+            )
+        } else {
+            ListAndDetailScreen(
+                viewModel = viewModel,
+                uiState = uiState,
+                modifier = Modifier.padding(innerPadding)
+            )
         }
     }
 }
