@@ -27,6 +27,8 @@ fun ListAndDetailScreen(
             listCategory = DataSource.getListCategory(),
             onClick = { category ->
                 viewModel.navigateToListLocationScreen(category)
+                val listLocation = DataSource.getListLocationByCategory(category)
+                viewModel.navigateToLocationScreen(listLocation[0])
             },
             modifier = Modifier
                 .weight(1.0f)
@@ -53,7 +55,6 @@ fun ListAndDetailScreen(
 @Preview(device = "id:pixel_tablet", showSystemUi = true, showBackground = false)
 @Composable
 fun ListAndDetailScreenPreview() {
-    val navController: NavHostController = rememberNavController()
     val viewModel: MyCityViewModel = viewModel()
     val uiState by viewModel.uiState.collectAsState()
 
