@@ -14,6 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.amphibians.ui.AmphibiansUiState
 import com.example.amphibians.ui.AmphibiansViewModel
+import com.example.amphibians.ui.screen.AmphibianList
+import com.example.amphibians.ui.screen.ErrorScreen
+import com.example.amphibians.ui.screen.LoadingScreen
 import com.example.amphibians.ui.theme.AmphibiansTheme
 
 class MainActivity : ComponentActivity() {
@@ -22,12 +25,25 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             AmphibiansTheme {
-                val viewModel: AmphibiansViewModel = viewModel(factory = AmphibiansViewModel.Factory)
+                val viewModel: AmphibiansViewModel =
+                    viewModel(factory = AmphibiansViewModel.Factory)
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
                     when (viewModel.amphibiansUiState) {
-                        is AmphibiansUiState.Loading -> Greeting("Loading", modifier = Modifier.padding(innerPadding))
-                        is AmphibiansUiState.Success -> AmphibianCard((viewModel.amphibiansUiState as AmphibiansUiState.Success).listAmphibianData[0], modifier = Modifier.padding(innerPadding))
-                        is AmphibiansUiState.Error -> Greeting("Error", modifier = Modifier.padding(innerPadding))
+                        is AmphibiansUiState.Loading -> LoadingScreen(
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                        )
+                        is AmphibiansUiState.Success -> AmphibianList(
+                            listAmphibianData = (viewModel.amphibiansUiState as AmphibiansUiState.Success).listAmphibianData,
+                            modifier = Modifier.padding(innerPadding)
+                        )
+                        is AmphibiansUiState.Error -> ErrorScreen(
+                            retryAction = viewModel::getListAmphibianData,
+                            modifier = Modifier
+                                .padding(innerPadding)
+                                .fillMaxSize()
+                        )
                     }
                 }
             }
