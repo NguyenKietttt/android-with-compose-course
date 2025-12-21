@@ -12,6 +12,10 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.bookshelf.BookshelfApplication
 import com.example.bookshelf.data.BookshelfRepository
 import com.example.bookshelf.model.BooksResponse
+import com.example.bookshelf.model.VolumeInfo
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import okio.IOException
 import retrofit2.HttpException
@@ -50,5 +54,12 @@ class BookshelfViewModel(private val bookshelfRepository: BookshelfRepository) :
                 BookshelfViewModel(bookshelfRepository)
             }
         }
+    }
+
+    private val _volumeInfoState = MutableStateFlow(VolumeInfo())
+    val volumeInfoState: StateFlow<VolumeInfo> = _volumeInfoState
+
+    fun setCurrentSelectedVolumeInfo(volumeInfo: VolumeInfo) {
+        _volumeInfoState.update { volumeInfo }
     }
 }
