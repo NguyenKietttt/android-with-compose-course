@@ -7,14 +7,15 @@ import androidx.room.RoomDatabase
 
 @Database(entities = [BusSchedule::class], version = 1, exportSchema = false)
 abstract class BusScheduleDatabase : RoomDatabase() {
-    abstract fun busScheduleDao(): BusScheduleDAO
+    abstract fun busScheduleDao(): BusScheduleDao
 
     companion object {
         private var Instance: BusScheduleDatabase? = null
 
         fun getDatabase(context: Context): BusScheduleDatabase {
             return Instance ?: synchronized(this) {
-                Room.databaseBuilder(context, BusScheduleDatabase::class.java, "bus_schedule")
+                Room.databaseBuilder(context.applicationContext, BusScheduleDatabase::class.java, "bus_schedule.db")
+                    .allowMainThreadQueries()
                     .fallbackToDestructiveMigration()
                     .build()
                     .also { Instance = it }

@@ -4,10 +4,10 @@ import androidx.room.Dao
 import androidx.room.Query
 
 @Dao
-interface BusScheduleDAO {
+interface BusScheduleDao {
     @Query(value = "SELECT * FROM Schedule ORDER BY arrival_time")
     fun getAll(): List<BusSchedule>
 
     @Query(value = "SELECT * FROM Schedule WHERE stop_name == :stopName")
-    fun getItem(stopName: String): BusSchedule
+    fun getItem(stopName: String): List<BusSchedule>
 }
