@@ -29,14 +29,10 @@ import kotlinx.coroutines.flow.flowOf
 class BusScheduleViewModel(private val busScheduleRepository: BusScheduleRepository) : ViewModel() {
 
     // Get example bus schedule
-    fun getFullSchedule(): Flow<List<BusSchedule>> = flowOf(
-        busScheduleRepository.getAll()
-    )
+    fun getFullSchedule(): Flow<List<BusSchedule>> = busScheduleRepository.getAll()
 
     // Get example bus schedule by stop
-    fun getScheduleFor(stopName: String): Flow<List<BusSchedule>> = flowOf(
-        busScheduleRepository.getItem(stopName)
-    )
+    fun getScheduleFor(stopName: String): Flow<List<BusSchedule>> = busScheduleRepository.getItem(stopName)
 
     companion object {
         val factory : ViewModelProvider.Factory = viewModelFactory {
