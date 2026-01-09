@@ -20,9 +20,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -31,10 +28,26 @@ import com.example.flightsearch.data.Airport
 
 @Composable
 fun FlightSearchApp(viewModel: FlightSearchViewModel = viewModel(factory = FlightSearchViewModel.factory)) {
+
+    val searchKeyword by viewModel.searchKeyword.collectAsState()
+    val isSearchBarExpanded by viewModel.isSearchBarExpanded.collectAsState()
+    val airports by viewModel.airports.collectAsState()
+
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         SearchScreen(
-            viewModel = viewModel,
-            modifier = Modifier.padding(innerPadding)
+            airports = airports,
+            query = searchKeyword,
+            onQueryChange = { viewModel.updateSearchKeyword(it) },
+            onSearch = {  },
+            expanded = isSearchBarExpanded,
+            onExpandedChange =  { viewModel.updateSearchBarExpandStatus(it) },
+            onCloseClick = {
+                if(searchKeyword.isEmpty())
+                    viewModel.updateSearchBarExpandStatus(false)
+                else
+                    viewModel.updateSearchKeyword("")
+            },
+            modifier = Modifier.padding(innerPadding),
         )
     }
 }
@@ -42,44 +55,43 @@ fun FlightSearchApp(viewModel: FlightSearchViewModel = viewModel(factory = Fligh
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SearchScreen(
-    viewModel: FlightSearchViewModel,
+    airports: List<Airport>,
+    query: String,
+    onQueryChange: (String) -> Unit,
+    onSearch: (String) -> Unit,
+    expanded: Boolean,
+    onExpandedChange: (Boolean) -> Unit,
+    onCloseClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var keyword by remember { mutableStateOf("") }
-    var isExpanded by remember { mutableStateOf(false) }
-
     SearchBar(
         inputField = {
             SearchBarDefaults.InputField(
-                query = keyword,
-                onQueryChange = {
-                    keyword = it
-                },
-                onSearch = { isExpanded = false },
-                expanded = isExpanded,
-                onExpandedChange = { isExpanded = it },
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
+                expanded = expanded,
+                onExpandedChange = onExpandedChange,
                 placeholder = { Text("Search") },
                 leadingIcon = { Icon(imageVector = Icons.Default.Search, contentDescription = "Search Icon") },
                 trailingIcon = {
-                    if (isExpanded) {
+                    if (expanded) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close Icon",
-                            modifier = Modifier.clickable {
-                                if (keyword.isEmpty()) isExpanded = false else keyword = ""
-                            })
+                            modifier = Modifier.clickable { onCloseClick() }
+                        )
                     }
                 }
             )
         },
-        expanded = isExpanded,
-        onExpandedChange = { isExpanded = it },
+        expanded = expanded,
+        onExpandedChange = onExpandedChange,
         modifier = modifier.fillMaxWidth()
     ) {
-        val airports by viewModel.findAirport(keyword).collectAsState(emptyList())
         LazyColumn {
             items(airports) { airport ->
-                SearchItem(
+                SearchSuggestion(
                     airport = airport,
                     onClick = { }
                 )
@@ -89,7 +101,7 @@ fun SearchScreen(
 }
 
 @Composable
-fun SearchItem(
+fun SearchSuggestion(
     airport: Airport,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -109,7 +121,7 @@ fun SearchItem(
 
 @Preview(showBackground = true)
 @Composable
-fun SearchItemPreview() {
+fun SearchSuggestionPreview() {
     val previewAirport = Airport(id = 0, iataCode = "VIE", fullName = "Vienna International Airport", numOfPassengersPerYear = 200)
-    SearchItem(airport = previewAirport, onClick = { })
+    SearchSuggestion(airport = previewAirport, onClick = { })
 }
