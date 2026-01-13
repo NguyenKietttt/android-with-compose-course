@@ -21,9 +21,7 @@ class FlightSearchViewModel(
 private val flightSearchRepository: FlightSearchRepository
 ) : ViewModel() {
     val searchKeyword = MutableStateFlow("")
-
     val isSearchBarExpanded = MutableStateFlow(false)
-
     val airports: StateFlow<List<Airport>> = searchKeyword
         .debounce(300L)
         .distinctUntilChanged()
@@ -33,6 +31,7 @@ private val flightSearchRepository: FlightSearchRepository
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = emptyList()
         )
+    val selectedAirport = MutableStateFlow<Airport?>(null)
 
     fun updateSearchKeyword(newSearchKeyword: String) {
         searchKeyword.value = newSearchKeyword
@@ -40,6 +39,10 @@ private val flightSearchRepository: FlightSearchRepository
 
     fun updateSearchBarExpandStatus(isExpanded: Boolean) {
         isSearchBarExpanded.value = isExpanded
+    }
+
+    fun updateSelectedAirport(airport: Airport?) {
+        selectedAirport.value = airport
     }
 
     companion object {

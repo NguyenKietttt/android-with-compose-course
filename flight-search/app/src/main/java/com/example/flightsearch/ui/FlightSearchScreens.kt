@@ -41,13 +41,13 @@ fun FlightSearchApp(
     val searchKeyword by viewModel.searchKeyword.collectAsState()
     val isSearchBarExpanded by viewModel.isSearchBarExpanded.collectAsState()
     val airports by viewModel.airports.collectAsState()
+    val selectedAirport by viewModel.selectedAirport.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        SearchScreen(
+        SearchBar(
             airports = airports,
             query = searchKeyword,
             onQueryChange = { viewModel.updateSearchKeyword(it) },
-            onSearch = { },
             expanded = isSearchBarExpanded,
             onExpandedChange = { viewModel.updateSearchBarExpandStatus(it) },
             onCloseClick = {
@@ -56,6 +56,10 @@ fun FlightSearchApp(
                 else
                     viewModel.updateSearchKeyword("")
             },
+            onItemClick = {
+                viewModel.updateSelectedAirport(it)
+                viewModel.updateSearchBarExpandStatus(false)
+            },
             modifier = Modifier.padding(innerPadding),
         )
     }
@@ -63,14 +67,14 @@ fun FlightSearchApp(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchScreen(
+fun SearchBar(
     airports: List<Airport>,
     query: String,
     onQueryChange: (String) -> Unit,
-    onSearch: (String) -> Unit,
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
     onCloseClick: () -> Unit,
+    onItemClick: (Airport) -> Unit,
     modifier: Modifier = Modifier
 ) {
     SearchBar(
@@ -78,7 +82,7 @@ fun SearchScreen(
             SearchBarDefaults.InputField(
                 query = query,
                 onQueryChange = onQueryChange,
-                onSearch = onSearch,
+                onSearch = { },
                 expanded = expanded,
                 onExpandedChange = onExpandedChange,
                 placeholder = { Text("Search") },
@@ -104,10 +108,27 @@ fun SearchScreen(
             items(airports) { airport ->
                 AirportInfo(
                     airport = airport,
-                    onClick = { },
+                    onClick = { onItemClick(airport) },
                     modifier = Modifier.padding(8.dp)
                 )
             }
+        }
+    }
+}
+
+@Composable
+fun ListSearchResult(
+    departureAirport: Airport,
+    listDestinationAirport: List<Airport>,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier) {
+        items(listDestinationAirport) { destinationAirport ->
+            SearchResult(
+                departureAirport = departureAirport,
+                destinationAirport = destinationAirport,
+                isFavourite = false
+            )
         }
     }
 }
@@ -127,7 +148,8 @@ fun SearchResult(
             Column {
                 Text(
                     text = "DEPART",
-                    style = MaterialTheme.typography.bodySmall)
+                    style = MaterialTheme.typography.bodySmall
+                )
                 AirportInfo(
                     airport = departureAirport,
                     onClick = { }
