@@ -42,26 +42,33 @@ fun FlightSearchApp(
     val isSearchBarExpanded by viewModel.isSearchBarExpanded.collectAsState()
     val airports by viewModel.airports.collectAsState()
     val selectedAirport by viewModel.selectedAirport.collectAsState()
+    val searchedAirports by viewModel.searchResult.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        SearchBar(
-            airports = airports,
-            query = searchKeyword,
-            onQueryChange = { viewModel.updateSearchKeyword(it) },
-            expanded = isSearchBarExpanded,
-            onExpandedChange = { viewModel.updateSearchBarExpandStatus(it) },
-            onCloseClick = {
-                if (searchKeyword.isEmpty())
+        Column {
+            SearchBar(
+                airports = airports,
+                query = searchKeyword,
+                onQueryChange = { viewModel.updateSearchKeyword(it) },
+                expanded = isSearchBarExpanded,
+                onExpandedChange = { viewModel.updateSearchBarExpandStatus(it) },
+                onCloseClick = {
+                    if (searchKeyword.isEmpty())
+                        viewModel.updateSearchBarExpandStatus(false)
+                    else
+                        viewModel.updateSearchKeyword("")
+                },
+                onItemClick = {
+                    viewModel.updateSelectedAirport(it)
                     viewModel.updateSearchBarExpandStatus(false)
-                else
-                    viewModel.updateSearchKeyword("")
-            },
-            onItemClick = {
-                viewModel.updateSelectedAirport(it)
-                viewModel.updateSearchBarExpandStatus(false)
-            },
-            modifier = Modifier.padding(innerPadding),
-        )
+                },
+                modifier = Modifier.padding(innerPadding),
+            )
+            ListSearchResult(
+                departureAirport = selectedAirport,
+                destinationAirports = searchedAirports
+            )
+        }
     }
 }
 
@@ -118,12 +125,12 @@ fun SearchBar(
 
 @Composable
 fun ListSearchResult(
-    departureAirport: Airport,
-    listDestinationAirport: List<Airport>,
+    departureAirport: Airport?,
+    destinationAirports: List<Airport>,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier) {
-        items(listDestinationAirport) { destinationAirport ->
+        items(destinationAirports) { destinationAirport ->
             SearchResult(
                 departureAirport = departureAirport,
                 destinationAirport = destinationAirport,
@@ -135,7 +142,7 @@ fun ListSearchResult(
 
 @Composable
 fun SearchResult(
-    departureAirport: Airport,
+    departureAirport: Airport?,
     destinationAirport: Airport,
     isFavourite: Boolean,
     modifier: Modifier = Modifier
@@ -200,7 +207,7 @@ fun SearchResultPreview() {
 
 @Composable
 fun AirportInfo(
-    airport: Airport,
+    airport: Airport?,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -209,12 +216,12 @@ fun AirportInfo(
         modifier = modifier.clickable(onClick = onClick)
     ) {
         Text(
-            text = airport.iataCode,
+            text = airport?.iataCode ?: "",
             style = MaterialTheme.typography.titleSmall,
         )
         Spacer(Modifier.width(8.dp))
         Text(
-            text = airport.fullName,
+            text = airport?.fullName ?: "",
             style = MaterialTheme.typography.bodySmall
         )
     }

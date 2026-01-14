@@ -14,5 +14,5 @@ interface FlightSearchDao {
     fun findAirport(keyword: String): Flow<List<Airport>>
 
     @Query("SELECT * FROM airport WHERE iata_code != :iataCode")
-    fun getListDestinationAirport(iataCode: Int): Flow<List<Airport>>
+    fun getListDestinationAirport(iataCode: String): Flow<List<Airport>>
 }

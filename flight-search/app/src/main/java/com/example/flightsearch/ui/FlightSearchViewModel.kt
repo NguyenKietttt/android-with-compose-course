@@ -32,6 +32,15 @@ private val flightSearchRepository: FlightSearchRepository
             initialValue = emptyList()
         )
     val selectedAirport = MutableStateFlow<Airport?>(null)
+    val searchResult: StateFlow<List<Airport>> = selectedAirport
+        .flatMapLatest { selectedAirport -> flightSearchRepository.getListDestinationAirport(
+            selectedAirport?.iataCode ?: ""
+        ) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyList()
+        )
 
     fun updateSearchKeyword(newSearchKeyword: String) {
         searchKeyword.value = newSearchKeyword
