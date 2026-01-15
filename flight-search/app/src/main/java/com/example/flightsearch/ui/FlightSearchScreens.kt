@@ -45,7 +45,7 @@ fun FlightSearchApp(
     val searchedAirports by viewModel.searchResult.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column {
+        Column(modifier = Modifier.padding(innerPadding)) {
             SearchBar(
                 airports = airports,
                 query = searchKeyword,
@@ -61,9 +61,14 @@ fun FlightSearchApp(
                 onItemClick = {
                     viewModel.updateSelectedAirport(it)
                     viewModel.updateSearchBarExpandStatus(false)
-                },
-                modifier = Modifier.padding(innerPadding),
+                }
             )
+            Spacer(Modifier.height(16.dp))
+            Text(
+                text = if (selectedAirport == null) "Favorite routes"
+                else "Flights from: ${selectedAirport!!.iataCode}"
+            )
+            Spacer(Modifier.height(16.dp))
             ListSearchResult(
                 departureAirport = selectedAirport,
                 destinationAirports = searchedAirports
@@ -134,7 +139,8 @@ fun ListSearchResult(
             SearchResult(
                 departureAirport = departureAirport,
                 destinationAirport = destinationAirport,
-                isFavourite = false
+                isFavourite = false,
+                modifier = Modifier.padding(bottom = 8.dp)
             )
         }
     }
@@ -150,9 +156,11 @@ fun SearchResult(
     Card(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
         ) {
-            Column {
+            Column(modifier = Modifier.weight(3.0f)) {
                 Text(
                     text = "DEPART",
                     style = MaterialTheme.typography.bodySmall
@@ -171,7 +179,9 @@ fun SearchResult(
                     onClick = { }
                 )
             }
-            IconButton(onClick = { }) {
+            IconButton(
+                onClick = { },
+            ) {
                 Icon(
                     imageVector = Icons.Default.Star,
                     contentDescription = "Favourite"
