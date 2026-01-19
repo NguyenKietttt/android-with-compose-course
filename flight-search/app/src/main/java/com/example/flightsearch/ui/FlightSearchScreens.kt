@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearch.data.Airport
+import com.example.flightsearch.data.FavoriteRoute
 
 @Composable
 fun FlightSearchApp(
@@ -45,8 +46,15 @@ fun FlightSearchApp(
     val searchedAirports by viewModel.searchResult.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(modifier = Modifier.padding(innerPadding)) {
-            SearchBar(
+        Column(
+            modifier = Modifier.padding(
+                start = 16.dp,
+                end = 16.dp,
+                top = innerPadding.calculateTopPadding(),
+                bottom = innerPadding.calculateBottomPadding()
+            )
+        ) {
+            CustomSearchBar(
                 airports = airports,
                 query = searchKeyword,
                 onQueryChange = { viewModel.updateSearchKeyword(it) },
@@ -79,7 +87,7 @@ fun FlightSearchApp(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(
+fun CustomSearchBar(
     airports: List<Airport>,
     query: String,
     onQueryChange: (String) -> Unit,
@@ -113,7 +121,7 @@ fun SearchBar(
             )
         },
         expanded = expanded,
-        onExpandedChange = onExpandedChange,
+        onExpandedChange = { onExpandedChange },
         modifier = modifier.fillMaxWidth()
     ) {
         LazyColumn {
@@ -158,7 +166,7 @@ fun SearchResult(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 20.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
+                .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
         ) {
             Column(modifier = Modifier.weight(3.0f)) {
                 Text(

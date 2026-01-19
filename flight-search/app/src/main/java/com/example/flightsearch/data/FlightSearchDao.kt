@@ -1,6 +1,8 @@
 package com.example.flightsearch.data
 
 import androidx.room.Dao
+import androidx.room.Delete
+import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
@@ -15,4 +17,19 @@ interface FlightSearchDao {
 
     @Query("SELECT * FROM airport WHERE iata_code != :iataCode")
     fun getListDestinationAirport(iataCode: String): Flow<List<Airport>>
+
+    @Query("SELECT * " +
+                    "FROM favourite " +
+                    "WHERE departure_code == :departureIataCode " +
+                    "AND destination_code == :destinationIataCode")
+    fun getFavoriteRoute(
+        departureIataCode: String,
+        destinationIataCode: String
+    ): Flow<List<FavoriteRoute>>
+
+    @Insert
+    suspend fun insertFavoriteRoute(favoriteRoute: FavoriteRoute)
+
+    @Delete
+    suspend fun deleteFavoriteRoute(favoriteRoute: FavoriteRoute)
 }

@@ -14,4 +14,19 @@ class FlightSearchRepository(private val flightSearchDao: FlightSearchDao) {
         else
             flightSearchDao.getListDestinationAirport(iataCode)
     }
+
+    fun getFavoriteRoute(
+        departureIataCode: String,
+        destinationIataCode: String
+    ): Flow<List<FavoriteRoute>> {
+        return flightSearchDao.getFavoriteRoute(departureIataCode, destinationIataCode)
+    }
+
+    suspend fun insertFavoriteRoute(route: FavoriteRoute) {
+        flightSearchDao.insertFavoriteRoute(route)
+    }
+
+    suspend fun deleteFavoriteRoute(route: FavoriteRoute) {
+        flightSearchDao.deleteFavoriteRoute(route)
+    }
 }

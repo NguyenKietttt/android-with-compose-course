@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.flightsearch.FlightSearchApplication
 import com.example.flightsearch.data.Airport
+import com.example.flightsearch.data.FavoriteRoute
 import com.example.flightsearch.data.FlightSearchRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -18,7 +19,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 
 class FlightSearchViewModel(
-private val flightSearchRepository: FlightSearchRepository
+    private val flightSearchRepository: FlightSearchRepository
 ) : ViewModel() {
     val searchKeyword = MutableStateFlow("")
     val isSearchBarExpanded = MutableStateFlow(false)
@@ -52,6 +53,14 @@ private val flightSearchRepository: FlightSearchRepository
 
     fun updateSelectedAirport(airport: Airport?) {
         selectedAirport.value = airport
+    }
+
+    suspend fun insertFavoriteRoute(departureAirport: Airport, destinationAirport: Airport) {
+        val favoriteRoute = FavoriteRoute(
+            departureIataCode = departureAirport.iataCode,
+            destinationIataCode = destinationAirport.iataCode
+        )
+        flightSearchRepository.insertFavoriteRoute(favoriteRoute)
     }
 
     companion object {
