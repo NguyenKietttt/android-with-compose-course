@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class FlightSearchViewModel(
     private val flightSearchRepository: FlightSearchRepository
@@ -32,8 +33,8 @@ class FlightSearchViewModel(
             started = SharingStarted.WhileSubscribed(5_000L),
             initialValue = emptyList()
         )
-    val selectedAirport = MutableStateFlow<Airport?>(null)
-    val searchResult: StateFlow<List<Airport>> = selectedAirport
+    val selectedDepartureAirport = MutableStateFlow<Airport?>(null)
+    val searchResult: StateFlow<List<Airport>> = selectedDepartureAirport
         .flatMapLatest { selectedAirport -> flightSearchRepository.getListDestinationAirport(
             selectedAirport?.iataCode ?: ""
         ) }
@@ -51,16 +52,18 @@ class FlightSearchViewModel(
         isSearchBarExpanded.value = isExpanded
     }
 
-    fun updateSelectedAirport(airport: Airport?) {
-        selectedAirport.value = airport
+    fun updateSelectedDepartureAirport(airport: Airport?) {
+        selectedDepartureAirport.value = airport
     }
 
-    suspend fun insertFavoriteRoute(departureAirport: Airport, destinationAirport: Airport) {
-        val favoriteRoute = FavoriteRoute(
-            departureIataCode = departureAirport.iataCode,
-            destinationIataCode = destinationAirport.iataCode
-        )
-        flightSearchRepository.insertFavoriteRoute(favoriteRoute)
+    fun insertFavoriteRoute(departureAirport: Airport, destinationAirport: Airport) {
+        viewModelScope.launch {
+            val favoriteRoute = FavoriteRoute(
+                departureIataCode = departureAirport.iataCode,
+                destinationIataCode = destinationAirport.iataCode
+            )
+            flightSearchRepository.insertFavoriteRoute(favoriteRoute)
+        }
     }
 
     companion object {

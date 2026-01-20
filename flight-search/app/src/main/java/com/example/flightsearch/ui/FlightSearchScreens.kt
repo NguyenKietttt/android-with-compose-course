@@ -29,11 +29,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearch.data.Airport
-import com.example.flightsearch.data.FavoriteRoute
 
 @Composable
 fun FlightSearchApp(
@@ -42,7 +40,7 @@ fun FlightSearchApp(
     val searchKeyword by viewModel.searchKeyword.collectAsState()
     val isSearchBarExpanded by viewModel.isSearchBarExpanded.collectAsState()
     val airports by viewModel.airports.collectAsState()
-    val selectedAirport by viewModel.selectedAirport.collectAsState()
+    val selectedDepartureAirport by viewModel.selectedDepartureAirport.collectAsState()
     val searchedAirports by viewModel.searchResult.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
@@ -67,19 +65,25 @@ fun FlightSearchApp(
                         viewModel.updateSearchKeyword("")
                 },
                 onItemClick = {
-                    viewModel.updateSelectedAirport(it)
+                    viewModel.updateSelectedDepartureAirport(it)
                     viewModel.updateSearchBarExpandStatus(false)
                 }
             )
             Spacer(Modifier.height(16.dp))
             Text(
-                text = if (selectedAirport == null) "Favorite routes"
-                else "Flights from: ${selectedAirport!!.iataCode}"
+                text = if (selectedDepartureAirport == null) "Favorite routes"
+                else "Flights from: ${selectedDepartureAirport!!.iataCode}"
             )
             Spacer(Modifier.height(16.dp))
             ListSearchResult(
-                departureAirport = selectedAirport,
-                destinationAirports = searchedAirports
+                departureAirport = selectedDepartureAirport,
+                destinationAirports = searchedAirports,
+                onFavoriteClick = { destinationAirport ->
+                    viewModel.insertFavoriteRoute(
+                        departureAirport = selectedDepartureAirport!!,
+                        destinationAirport= destinationAirport!!
+                    )
+                }
             )
         }
     }
@@ -121,7 +125,7 @@ fun CustomSearchBar(
             )
         },
         expanded = expanded,
-        onExpandedChange = { onExpandedChange },
+        onExpandedChange = onExpandedChange,
         modifier = modifier.fillMaxWidth()
     ) {
         LazyColumn {
@@ -140,6 +144,7 @@ fun CustomSearchBar(
 fun ListSearchResult(
     departureAirport: Airport?,
     destinationAirports: List<Airport>,
+    onFavoriteClick: (Airport?) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier) {
@@ -148,6 +153,7 @@ fun ListSearchResult(
                 departureAirport = departureAirport,
                 destinationAirport = destinationAirport,
                 isFavourite = false,
+                onFavoriteClick = { onFavoriteClick(destinationAirport) },
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
@@ -159,6 +165,7 @@ fun SearchResult(
     departureAirport: Airport?,
     destinationAirport: Airport,
     isFavourite: Boolean,
+    onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(modifier = modifier) {
@@ -188,7 +195,7 @@ fun SearchResult(
                 )
             }
             IconButton(
-                onClick = { },
+                onClick = onFavoriteClick,
             ) {
                 Icon(
                     imageVector = Icons.Default.Star,
@@ -197,30 +204,6 @@ fun SearchResult(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SearchResultPreview() {
-    val departureAirport = Airport(
-        id = 0,
-        iataCode = "VIE",
-        fullName = "Vienna International Airport",
-        numOfPassengersPerYear = 200
-    )
-
-    val destinationAirportAirport = Airport(
-        id = 1,
-        iataCode = "ABC",
-        fullName = "ABC International Airport",
-        numOfPassengersPerYear = 500
-    )
-
-    SearchResult(
-        departureAirport = departureAirport,
-        destinationAirport = destinationAirportAirport,
-        isFavourite = false
-    )
 }
 
 @Composable
@@ -243,20 +226,4 @@ fun AirportInfo(
             style = MaterialTheme.typography.bodySmall
         )
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun AirportInfoPreview() {
-    val airport = Airport(
-        id = 0,
-        iataCode = "VIE",
-        fullName = "Vienna International Airport",
-        numOfPassengersPerYear = 200
-    )
-    AirportInfo(
-        airport = airport,
-        onClick = { },
-        modifier = Modifier.padding(8.dp)
-    )
 }
