@@ -10,6 +10,7 @@ import com.example.flightsearch.FlightSearchApplication
 import com.example.flightsearch.data.Airport
 import com.example.flightsearch.data.FavoriteRoute
 import com.example.flightsearch.data.FlightSearchRepository
+import com.example.flightsearch.data.Route
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -36,8 +37,8 @@ class FlightSearchViewModel(
     fun updateSelectedDepartureAirport(airport: Airport?) {
         selectedDepartureAirport.value = airport
     }
-    val searchResult: StateFlow<List<Airport>> = selectedDepartureAirport
-        .flatMapLatest { selectedAirport -> flightSearchRepository.getListDestinationAirport(
+    val routes: StateFlow<List<Route>> = selectedDepartureAirport
+        .flatMapLatest { selectedAirport -> flightSearchRepository.getRoutes(
             selectedAirport?.iataCode ?: ""
         ) }
         .stateIn(
@@ -56,13 +57,29 @@ class FlightSearchViewModel(
             initialValue = emptyList()
         )
 
-    fun insertFavoriteRoute(departureAirport: Airport, destinationAirport: Airport) {
+    val favoriteRoutes: StateFlow<List<Route>> = flightSearchRepository.getFavoriteRoutes()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyList()
+        )
+
+    fun insertFavoriteRoute(route: Route) {
         viewModelScope.launch {
             val favoriteRoute = FavoriteRoute(
-                departureIataCode = departureAirport.iataCode,
-                destinationIataCode = destinationAirport.iataCode
+                departureIataCode = route.departureAirport.iataCode,
+                destinationIataCode = route.destinationAirport.iataCode
             )
             flightSearchRepository.insertFavoriteRoute(favoriteRoute)
+        }
+    }
+
+    fun deleteFavoriteRoute(route: Route) {
+        viewModelScope.launch {
+            flightSearchRepository.deleteFavoriteRoute(
+                route.departureAirport.iataCode,
+                route.destinationAirport.iataCode
+            )
         }
     }
 

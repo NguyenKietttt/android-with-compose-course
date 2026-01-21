@@ -8,25 +8,22 @@ class FlightSearchRepository(private val flightSearchDao: FlightSearchDao) {
         return flightSearchDao.findAirport(keyword)
     }
 
-    fun getListDestinationAirport(iataCode: String): Flow<List<Airport>> {
-        return if (iataCode.isEmpty())
+    fun getRoutes(deparetureIataCode: String): Flow<List<Route>> {
+        return if (deparetureIataCode.isEmpty())
             flowOf(emptyList())
         else
-            flightSearchDao.getListDestinationAirport(iataCode)
+            flightSearchDao.getRoutes(deparetureIataCode)
     }
 
-    suspend fun isFavoriteRouteExist(
-        departureIataCode: String,
-        destinationIataCode: String
-    ): Boolean {
-        return flightSearchDao.isFavoriteRouteExist(departureIataCode, destinationIataCode)
+    fun getFavoriteRoutes(): Flow<List<Route>> {
+        return flightSearchDao.getFavoriteRoutes()
     }
 
     suspend fun insertFavoriteRoute(route: FavoriteRoute) {
         flightSearchDao.insertFavoriteRoute(route)
     }
 
-    suspend fun deleteFavoriteRoute(route: FavoriteRoute) {
-        flightSearchDao.deleteFavoriteRoute(route)
+    suspend fun deleteFavoriteRoute(departureIataCode: String, destinationIataCode: String) {
+        flightSearchDao.deleteFavoriteRoute(departureIataCode, destinationIataCode)
     }
 }

@@ -19,6 +19,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
@@ -29,9 +30,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearch.data.Airport
+import com.example.flightsearch.data.Route
 
 @Composable
 fun FlightSearchApp(
@@ -41,7 +44,8 @@ fun FlightSearchApp(
     val isSearchBarExpanded by viewModel.isSearchBarExpanded.collectAsState()
     val airports by viewModel.airports.collectAsState()
     val selectedDepartureAirport by viewModel.selectedDepartureAirport.collectAsState()
-    val searchedAirports by viewModel.searchResult.collectAsState()
+    val routes by viewModel.routes.collectAsState()
+    val favoriteRoutes by viewModel.favoriteRoutes.collectAsState()
 
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
         Column(
@@ -76,13 +80,13 @@ fun FlightSearchApp(
             )
             Spacer(Modifier.height(16.dp))
             ListSearchResult(
-                departureAirport = selectedDepartureAirport,
-                destinationAirports = searchedAirports,
-                onFavoriteClick = { destinationAirport ->
-                    viewModel.insertFavoriteRoute(
-                        departureAirport = selectedDepartureAirport!!,
-                        destinationAirport= destinationAirport!!
-                    )
+                routes = if (selectedDepartureAirport == null) favoriteRoutes else routes,
+                onFavoriteClick = { route ->
+                    if (route.isFavorite) {
+                        viewModel.deleteFavoriteRoute(route)
+                    } else {
+                        viewModel.insertFavoriteRoute(route)
+                    }
                 }
             )
         }
@@ -142,18 +146,17 @@ fun CustomSearchBar(
 
 @Composable
 fun ListSearchResult(
-    departureAirport: Airport?,
-    destinationAirports: List<Airport>,
-    onFavoriteClick: (Airport?) -> Unit,
+    routes: List<Route>,
+    onFavoriteClick: (Route) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(modifier) {
-        items(destinationAirports) { destinationAirport ->
+        items(routes) { route ->
             SearchResult(
-                departureAirport = departureAirport,
-                destinationAirport = destinationAirport,
-                isFavourite = false,
-                onFavoriteClick = { onFavoriteClick(destinationAirport) },
+                departureAirport = route.departureAirport,
+                destinationAirport = route.destinationAirport,
+                isFavorite = route.isFavorite,
+                onFavoriteClick = { onFavoriteClick(route) },
                 modifier = Modifier.padding(bottom = 8.dp)
             )
         }
@@ -162,9 +165,9 @@ fun ListSearchResult(
 
 @Composable
 fun SearchResult(
-    departureAirport: Airport?,
+    departureAirport: Airport,
     destinationAirport: Airport,
-    isFavourite: Boolean,
+    isFavorite: Boolean,
     onFavoriteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -199,7 +202,8 @@ fun SearchResult(
             ) {
                 Icon(
                     imageVector = Icons.Default.Star,
-                    contentDescription = "Favourite"
+                    contentDescription = "Favourite",
+                    tint = if (isFavorite) Color.Red else LocalContentColor.current
                 )
             }
         }
