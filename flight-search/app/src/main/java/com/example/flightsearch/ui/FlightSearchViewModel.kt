@@ -23,17 +23,19 @@ class FlightSearchViewModel(
     private val flightSearchRepository: FlightSearchRepository
 ) : ViewModel() {
     val searchKeyword = MutableStateFlow("")
+    fun updateSearchKeyword(newSearchKeyword: String) {
+        searchKeyword.value = newSearchKeyword
+    }
+
     val isSearchBarExpanded = MutableStateFlow(false)
-    val airports: StateFlow<List<Airport>> = searchKeyword
-        .debounce(300L)
-        .distinctUntilChanged()
-        .flatMapLatest { keyword -> flightSearchRepository.findAirport(keyword) }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000L),
-            initialValue = emptyList()
-        )
+    fun updateSearchBarExpandStatus(isExpanded: Boolean) {
+        isSearchBarExpanded.value = isExpanded
+    }
+
     val selectedDepartureAirport = MutableStateFlow<Airport?>(null)
+    fun updateSelectedDepartureAirport(airport: Airport?) {
+        selectedDepartureAirport.value = airport
+    }
     val searchResult: StateFlow<List<Airport>> = selectedDepartureAirport
         .flatMapLatest { selectedAirport -> flightSearchRepository.getListDestinationAirport(
             selectedAirport?.iataCode ?: ""
@@ -44,17 +46,15 @@ class FlightSearchViewModel(
             initialValue = emptyList()
         )
 
-    fun updateSearchKeyword(newSearchKeyword: String) {
-        searchKeyword.value = newSearchKeyword
-    }
-
-    fun updateSearchBarExpandStatus(isExpanded: Boolean) {
-        isSearchBarExpanded.value = isExpanded
-    }
-
-    fun updateSelectedDepartureAirport(airport: Airport?) {
-        selectedDepartureAirport.value = airport
-    }
+    val airports: StateFlow<List<Airport>> = searchKeyword
+        .debounce(300L)
+        .distinctUntilChanged()
+        .flatMapLatest { keyword -> flightSearchRepository.findAirport(keyword) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = emptyList()
+        )
 
     fun insertFavoriteRoute(departureAirport: Airport, destinationAirport: Airport) {
         viewModelScope.launch {
