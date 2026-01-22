@@ -11,6 +11,7 @@ import com.example.flightsearch.data.Airport
 import com.example.flightsearch.data.FavoriteRoute
 import com.example.flightsearch.data.FlightSearchRepository
 import com.example.flightsearch.data.Route
+import com.example.flightsearch.data.SearchKeywordRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -21,11 +22,19 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class FlightSearchViewModel(
-    private val flightSearchRepository: FlightSearchRepository
+    private val flightSearchRepository: FlightSearchRepository,
+    private val searchKeywordRepository: SearchKeywordRepository
 ) : ViewModel() {
-    val searchKeyword = MutableStateFlow("")
+    val searchKeyword = searchKeywordRepository.searchKeyword
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000L),
+            initialValue = ""
+        )
     fun updateSearchKeyword(newSearchKeyword: String) {
-        searchKeyword.value = newSearchKeyword
+        viewModelScope.launch {
+            searchKeywordRepository.saveSearchKeyword(newSearchKeyword)
+        }
     }
 
     val isSearchBarExpanded = MutableStateFlow(false)
@@ -88,7 +97,8 @@ class FlightSearchViewModel(
             initializer {
                 val application = (this[APPLICATION_KEY] as FlightSearchApplication)
                 val flightSearchRepository = application.container.flightSearchRepository
-                FlightSearchViewModel(flightSearchRepository)
+                val searchKeywordRepository = application.container.searchKeywordRepository
+                FlightSearchViewModel(flightSearchRepository, searchKeywordRepository)
             }
         }
     }

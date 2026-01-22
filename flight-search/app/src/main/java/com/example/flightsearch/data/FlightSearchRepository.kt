@@ -8,11 +8,11 @@ class FlightSearchRepository(private val flightSearchDao: FlightSearchDao) {
         return flightSearchDao.findAirport(keyword)
     }
 
-    fun getRoutes(deparetureIataCode: String): Flow<List<Route>> {
-        return if (deparetureIataCode.isEmpty())
+    fun getRoutes(departureIataCode: String): Flow<List<Route>> {
+        return if (departureIataCode.isEmpty())
             flowOf(emptyList())
         else
-            flightSearchDao.getRoutes(deparetureIataCode)
+            flightSearchDao.getRoutes(departureIataCode)
     }
 
     fun getFavoriteRoutes(): Flow<List<Route>> {

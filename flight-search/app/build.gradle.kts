@@ -57,6 +57,8 @@ dependencies {
     ksp("androidx.room:room-compiler:2.8.4")
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    implementation("androidx.datastore:datastore-preferences:1.2.0")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
