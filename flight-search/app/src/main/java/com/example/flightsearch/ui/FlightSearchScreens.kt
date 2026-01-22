@@ -1,7 +1,9 @@
 package com.example.flightsearch.ui
 
 import android.util.Log
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +19,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,12 +34,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.flightsearch.data.Airport
 import com.example.flightsearch.data.Route
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FlightSearchApp(
     viewModel: FlightSearchViewModel = viewModel(factory = FlightSearchViewModel.factory)
@@ -48,15 +53,35 @@ fun FlightSearchApp(
     val routes by viewModel.routes.collectAsState()
     val favoriteRoutes by viewModel.favoriteRoutes.collectAsState()
 
+    val shadowElevation by animateDpAsState(
+        targetValue = if (isSearchBarExpanded) 8.dp else 0.dp,
+        label = "SearchBarShadow"
+    )
+
     Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(
+        Box(modifier = Modifier.padding(
                 start = 16.dp,
                 end = 16.dp,
                 top = innerPadding.calculateTopPadding(),
                 bottom = innerPadding.calculateBottomPadding()
             )
         ) {
+            ListSearchResult(
+                routes = if (selectedDepartureAirport == null) favoriteRoutes else routes,
+                onFavoriteClick = { route ->
+                    if (route.isFavorite) {
+                        viewModel.deleteFavoriteRoute(route)
+                    } else {
+                        viewModel.insertFavoriteRoute(route)
+                    }
+                },
+                modifier = Modifier.padding(top = 104.dp)
+            )
+            Text(
+                text = if (selectedDepartureAirport == null) "Favorite routes"
+                    else "Flights from: ${selectedDepartureAirport!!.iataCode}",
+                modifier = Modifier.padding(top = 72.dp)
+            )
             CustomSearchBar(
                 airports = airports,
                 query = searchKeyword,
@@ -72,23 +97,8 @@ fun FlightSearchApp(
                 onItemClick = {
                     viewModel.updateSelectedDepartureAirport(it)
                     viewModel.updateSearchBarExpandStatus(false)
-                }
-            )
-            Spacer(Modifier.height(16.dp))
-            Text(
-                text = if (selectedDepartureAirport == null) "Favorite routes"
-                else "Flights from: ${selectedDepartureAirport!!.iataCode}"
-            )
-            Spacer(Modifier.height(16.dp))
-            ListSearchResult(
-                routes = if (selectedDepartureAirport == null) favoriteRoutes else routes,
-                onFavoriteClick = { route ->
-                    if (route.isFavorite) {
-                        viewModel.deleteFavoriteRoute(route)
-                    } else {
-                        viewModel.insertFavoriteRoute(route)
-                    }
-                }
+                },
+                modifier = Modifier.shadow(elevation = shadowElevation, shape = SearchBarDefaults.dockedShape),
             )
         }
     }
@@ -106,7 +116,7 @@ fun CustomSearchBar(
     onItemClick: (Airport) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    SearchBar(
+    DockedSearchBar(
         inputField = {
             SearchBarDefaults.InputField(
                 query = query,
