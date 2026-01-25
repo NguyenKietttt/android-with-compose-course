@@ -37,6 +37,7 @@ class WorkManagerWaterRepository(context: Context) : WaterRepository {
 
         val scheduleReminderBuilder = OneTimeWorkRequestBuilder<WaterReminderWorker>()
         scheduleReminderBuilder.setInputData(dataBuilder.build())
+        scheduleReminderBuilder.setInitialDelay(duration, unit)
 
         workManager.enqueueUniqueWork(
             uniqueWorkName = plantName + duration,
