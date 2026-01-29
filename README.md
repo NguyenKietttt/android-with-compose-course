@@ -15,15 +15,16 @@
 | [affirmations](./affirmations) | State |
 | [courses-app](./courses-app) | State |
 | [woof](./woof) | Theme, Animation |
-| [superheros](./superheroes) | Theme |
+| [superheroes](./superheroes) | Theme |
 | [thirty-days-app](./thirty-days-app) | Theme, Animation |
 | [unscramble](./unscramble) | ViewModel |
 | [dessert-clicker](./dessert-clicker) | ViewModel |
 | [cupcake](./cupcake) | Navigation |
-| [launch-tray](./lunch-tray) | Navigation |
+| [lunch-tray](./lunch-tray) | Navigation |
 | [reply](./reply) | Adaptive Layout |
 | [sports](./sports) | Adaptive Layout |
 | [my-city](./my-city) | Adaptive Layout |
+| [race-tracker](./race-tracker) | Coroutines |
 | [mars-photos](./mars-photos) | Retrofit, Dependency injection, Coil |
 | [amphibians](./amphibians) | Retrofit, Dependency injection, Coil |
 | [bookshelf](./bookshelf) | Retrofit, Dependency injection, Coil |
